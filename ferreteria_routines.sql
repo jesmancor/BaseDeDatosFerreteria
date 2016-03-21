@@ -82,17 +82,23 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `conProducto`(IN id CHAR(13), IN cantidad INT, OUT mensaje VARCHAR(70), OUT retorno INT, OUT nombre VARCHAR(50))
+CREATE DEFINER=`root`@`localhost` PROCEDURE `conProducto`(IN id CHAR(13), IN cantidad INT, OUT mensaje VARCHAR(70), OUT retorno INT, OUT nombre VARCHAR(50),IN tipoCon CHAR(1))
 venta: BEGIN
 DECLARE existenciasresta INT;
 DECLARE reorden INT;
 DECLARE minimo INT;
+-- --
+DECLARE tipoConVenta CHAR(1); 
+DECLARE tipoConMod CHAR(1);
+SET tipoConVenta = '1';
+SET tipoConMod = '2';
 -- --
 SELECT NOMBRE_PRODUCTO FROM productos
 WHERE ID_PRODUCTO = id INTO nombre;
 -- --
 IF (nombre IS NOT NULL) THEN
 -- --
+IF (tipoCon = tipoConVenta) THEN
 SET existenciasresta = calculaExistencias(id,cantidad);
 --
 IF (existenciasresta>=0) THEN
@@ -102,6 +108,8 @@ IF (existenciasresta>=0) THEN
 		SET mensaje = 'El producto está en su punto mínimo';
 	ELSEIF (existenciasresta<reorden) THEN
 		SET mensaje = 'El producto está en su punto de reorden';
+	ELSE
+		SET mensaje = 'nulo';
 	END IF;
     SET retorno = 1;
 -- --
@@ -111,6 +119,21 @@ ELSE
     LEAVE venta;
 END IF;
 -- --
+ELSEIF (tipoCon=tipoConMod) THEN
+	SELECT 
+    NOMBRE_PRODUCTO,
+    DESCRIPCION_PRODUCTO,
+    TIPO_PRODUCTO,
+    PRECIO_MENUDEO,
+    PRECIO_MAYOREO,
+    DESCUENTO,
+    EXISTENCIAS,
+    MAXIMO_PRODUCTO,
+    MINIMO_PRODUCTO,
+    REORDENAR
+    FROM productos
+    WHERE ID_PRODUCTO = id;
+END IF;
 ELSE 
 SET mensaje = 'El producto no existe';
 SET retorno = 0;
@@ -157,6 +180,123 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `productoAlta` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `productoAlta`(
+in id char(13),
+in nombre varchar(50),
+in tipo varchar(50),
+in descripcion varchar(200),
+in pMenudeo double,
+in pMayoreo double,
+in descuento int,
+in existencias int,
+in minimo int,
+in maximo int,
+in reorden int
+)
+BEGIN
+INSERT INTO `ferreteria`.`productos`
+(`ID_PRODUCTO`,
+`NOMBRE_PRODUCTO`,
+`TIPO_PRODUCTO`,
+`DESCRIPCION_PRODUCTO`,
+`PRECIO_MENUDEO`,
+`PRECIO_MAYOREO`,
+`DESCUENTO`,
+`EXISTENCIAS`,
+`MINIMO_PRODUCTO`,
+`MAXIMO_PRODUCTO`,
+`REORDENAR`)
+VALUES
+(id,
+nombre,
+tipo,
+descripcion,
+pMenudeo,
+pMayoreo,
+descuento,
+existencias,
+minimo,
+maximo,
+reorden);
+
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `productoBaja` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `productoBaja`(in id char(13))
+BEGIN
+delete from productos where ID_PRODUCTO = id;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `productoMod` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `productoMod`(
+in id char(13),
+in nombre varchar(50),
+in tipo varchar(50),
+in descripcion varchar(200),
+in pMenudeo double,
+in pMayoreo double,
+in descuento int,
+in existencias int,
+in minimo int,
+in maximo int,
+in reorden int
+)
+BEGIN
+update productos set
+`NOMBRE_PRODUCTO`=nombre,
+`TIPO_PRODUCTO`=tipo,
+`DESCRIPCION_PRODUCTO`=descripcion,
+`PRECIO_MENUDEO`=pMenudeo,
+`PRECIO_MAYOREO`=pMayoreo,
+`DESCUENTO`=descuento,
+`EXISTENCIAS`=existencias,
+`MINIMO_PRODUCTO`=minimo,
+`MAXIMO_PRODUCTO`=maximo,
+`REORDENAR`=reorden
+where ID_PRODUCTO = id;
+
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `venta` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -197,4 +337,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-03-02 23:27:43
+-- Dump completed on 2016-03-20 23:56:27
