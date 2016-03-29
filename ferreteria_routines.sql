@@ -82,7 +82,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `conProducto`(IN id CHAR(13), IN cantidad INT, OUT mensaje VARCHAR(70), OUT retorno INT, OUT nombre VARCHAR(50),IN tipoCon CHAR(1))
+CREATE DEFINER=`root`@`localhost` PROCEDURE `conProducto`(IN id CHAR(13), IN cantidad INT, OUT mensaje VARCHAR(70), OUT retorno INT, OUT nombre VARCHAR(50), IN descripcion VARCHAR(200),IN tipoCon CHAR(1))
 venta: BEGIN
 DECLARE existenciasresta INT;
 DECLARE reorden INT;
@@ -90,8 +90,10 @@ DECLARE minimo INT;
 -- --
 DECLARE tipoConVenta CHAR(1); 
 DECLARE tipoConMod CHAR(1);
+DECLARE tipoConPorDescri CHAR(1);
 SET tipoConVenta = '1';
 SET tipoConMod = '2';
+SET tipoConPorDescri = '3';
 -- --
 SELECT NOMBRE_PRODUCTO FROM productos
 WHERE ID_PRODUCTO = id INTO nombre;
@@ -137,7 +139,10 @@ END IF;
 ELSE 
 SET mensaje = 'El producto no existe';
 SET retorno = 0;
-LEAVE venta;
+IF (tipoCon=tipoConPorDescri) THEN
+	SET descripcion = CONCAT('%', descripcion,'%');
+	SELECT * FROM productos WHERE DESCRIPCION_PRODUCTO LIKE	descripcion;
+    END IF;
 END IF;
 END ;;
 DELIMITER ;
@@ -337,4 +342,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-03-20 23:56:27
+-- Dump completed on 2016-03-29  4:45:12
