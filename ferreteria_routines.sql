@@ -141,7 +141,7 @@ SET mensaje = 'El producto no existe';
 SET retorno = 0;
 IF (tipoCon=tipoConPorDescri) THEN
 	SET descripcion = CONCAT('%', descripcion,'%');
-	SELECT * FROM productos WHERE DESCRIPCION_PRODUCTO LIKE	descripcion;
+	SELECT * FROM productos WHERE DESCRIPCION_PRODUCTO LIKE	descripcion OR NOMBRE_PRODUCTO LIKE descripcion;
     END IF;
 END IF;
 END ;;
@@ -202,11 +202,7 @@ in tipo varchar(50),
 in descripcion varchar(200),
 in pMenudeo double,
 in pMayoreo double,
-in descuento int,
-in existencias int,
-in minimo int,
-in maximo int,
-in reorden int
+in descuento int
 )
 BEGIN
 INSERT INTO `ferreteria`.`productos`
@@ -216,11 +212,7 @@ INSERT INTO `ferreteria`.`productos`
 `DESCRIPCION_PRODUCTO`,
 `PRECIO_MENUDEO`,
 `PRECIO_MAYOREO`,
-`DESCUENTO`,
-`EXISTENCIAS`,
-`MINIMO_PRODUCTO`,
-`MAXIMO_PRODUCTO`,
-`REORDENAR`)
+`DESCUENTO`)
 VALUES
 (id,
 nombre,
@@ -228,11 +220,7 @@ tipo,
 descripcion,
 pMenudeo,
 pMayoreo,
-descuento,
-existencias,
-minimo,
-maximo,
-reorden);
+descuento);
 
 END ;;
 DELIMITER ;
@@ -277,26 +265,31 @@ in descripcion varchar(200),
 in pMenudeo double,
 in pMayoreo double,
 in descuento int,
-in existencias int,
-in minimo int,
+in nuevaExistencia int,
 in maximo int,
-in reorden int
+in minimo int,
+in reorden int,
+in tipoMod char(1)
 )
-BEGIN
-update productos set
-`NOMBRE_PRODUCTO`=nombre,
-`TIPO_PRODUCTO`=tipo,
-`DESCRIPCION_PRODUCTO`=descripcion,
-`PRECIO_MENUDEO`=pMenudeo,
-`PRECIO_MAYOREO`=pMayoreo,
-`DESCUENTO`=descuento,
-`EXISTENCIAS`=existencias,
-`MINIMO_PRODUCTO`=minimo,
-`MAXIMO_PRODUCTO`=maximo,
-`REORDENAR`=reorden
-where ID_PRODUCTO = id;
-
-END ;;
+begin
+if(tipoMod='1') then
+	update productos set
+	NOMBRE_PRODUCTO = nombre,
+	TIPO_PRODUCTO = tipo,
+	DESCRIPCION_PRODUCTO = descripcion,
+	PRECIO_MENUDEO = pMenudeo,
+	PRECIO_MAYOREO = pMayoreo,
+	DESCUENTO = descuento
+	where ID_PRODUCTO = id;
+    
+elseif(tipoMod='2') then
+	update productos set
+    EXISTENCIAS = nuevaExistencia,
+    MAXIMO_PRODUCTO = maximo,
+    MINIMO_PRODUCTO = minimo
+    where ID_PRODUCTO = id;
+end if;
+end ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
@@ -342,4 +335,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-03-29  4:45:12
+-- Dump completed on 2016-04-11 22:50:12
