@@ -23,9 +23,9 @@ DROP TABLE IF EXISTS `proveedores`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `proveedores` (
-  `Id` int(10) NOT NULL,
+  `ID_PROVEEDOR` char(3) NOT NULL,
   `NOMBRE_PROVEEDOR` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`Id`)
+  PRIMARY KEY (`ID_PROVEEDOR`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -35,6 +35,7 @@ CREATE TABLE `proveedores` (
 
 LOCK TABLES `proveedores` WRITE;
 /*!40000 ALTER TABLE `proveedores` DISABLE KEYS */;
+INSERT INTO `proveedores` VALUES ('001','PROVEEDOR UNO'),('002','PROVEEDOR DOS');
 /*!40000 ALTER TABLE `proveedores` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -47,4 +48,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-04-11 22:50:11
+-- Dump completed on 2016-06-06 22:50:46

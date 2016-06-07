@@ -16,28 +16,28 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `login`
+-- Table structure for table `relprovprod`
 --
 
-DROP TABLE IF EXISTS `login`;
+DROP TABLE IF EXISTS `relprovprod`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `login` (
-  `Id` int(10) NOT NULL,
-  `USERNAME` varchar(255) DEFAULT NULL,
-  `PASSWORD` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`Id`)
+CREATE TABLE `relprovprod` (
+  `ID_PRODUCTO` char(13) NOT NULL,
+  `PRECIO_PRODUCTO` double NOT NULL DEFAULT '0',
+  `ID_PROVEEDOR` char(3) NOT NULL,
+  PRIMARY KEY (`ID_PRODUCTO`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `login`
+-- Dumping data for table `relprovprod`
 --
 
-LOCK TABLES `login` WRITE;
-/*!40000 ALTER TABLE `login` DISABLE KEYS */;
-INSERT INTO `login` VALUES (1,'chuy','111111');
-/*!40000 ALTER TABLE `login` ENABLE KEYS */;
+LOCK TABLES `relprovprod` WRITE;
+/*!40000 ALTER TABLE `relprovprod` DISABLE KEYS */;
+INSERT INTO `relprovprod` VALUES ('000000000000',100,'001'),('1233333333333',100.5,'001');
+/*!40000 ALTER TABLE `relprovprod` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

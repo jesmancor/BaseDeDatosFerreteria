@@ -269,9 +269,12 @@ in nuevaExistencia int,
 in maximo int,
 in minimo int,
 in reorden int,
-in tipoMod char(1)
+in proveedor char(3),
+in cantidad int,
+in tipoMod char(1),
+out mensaje varchar(100)
 )
-begin
+modi:begin
 if(tipoMod='1') then
 	update productos set
 	NOMBRE_PRODUCTO = nombre,
@@ -283,6 +286,35 @@ if(tipoMod='1') then
 	where ID_PRODUCTO = id;
     
 elseif(tipoMod='2') then
+
+	if(reorden>=maximo) then
+		set mensaje = 'El punto de reorden no puede ser mayor al máximo';
+		rollback;
+        leave modi;
+    end if;
+    
+    if(reorden<=minimo) then
+		set mensaje = 'El punto de reorden no puede ser menor al mínimo';
+		rollback;
+        leave modi;
+    end if;
+    
+    if(minimo>=maximo) then
+		set mensaje = 'El punto de mínimo no puede ser mayor al máximo';
+		rollback;
+        leave modi;
+    end if;
+    
+    if not exists(select NOMBRE_PROVEEDOR
+    from proveedores where ID_PROVEEDOR = proveedor) then
+		set mensaje = 'Debe asignar un proveedor para realizar la compra';
+		rollback;
+        leave modi;
+    end if;
+    
+	insert into compras values
+    (null, proveedor, cantidad, 0, 0);
+	
 	update productos set
     EXISTENCIAS = nuevaExistencia,
     MAXIMO_PRODUCTO = maximo,
@@ -290,6 +322,139 @@ elseif(tipoMod='2') then
     where ID_PRODUCTO = id;
 end if;
 end ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `proveedorAlta` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proveedorAlta`(in id char(10), in nombre varchar(255), out mensaje varchar(255))
+alta:BEGIN
+	if(nombre='') then
+		set mensaje = 'Debe ingresar el nombre del proveedor';
+		rollback;
+        leave alta;
+    end if;
+
+	insert into proveedores (ID_PROVEEDOR, NOMBRE_PROVEEDOR) values (id, nombre);
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `proveedorBaja` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proveedorBaja`(in id char(3))
+BEGIN
+	delete from proveedores where ID_PROVEEDOR = id;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `proveedorCon` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proveedorCon`(in id char(3), in nombre varchar(255), in tipoCon char(1))
+BEGIN
+if tipoCon = '1' then
+	select NOMBRE_PROVEEDOR from proveedores where ID_PROVEEDOR = id;
+elseif tipoCOn = '2' then
+	set nombre = CONCAT('%', nombre,'%');
+	select ID_PROVEEDOR, NOMBRE_PROVEEDOR from proveedores where NOMBRE_PROVEEDOR like nombre;
+end if;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `proveedorMod` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proveedorMod`(in id char(3),in nombre varchar(255), out mensaje varchar(255))
+modif:BEGIN
+	if(nombre='') then
+		set mensaje = 'Debe ingresar el nombre del proveedor';
+		rollback;
+        leave modif;
+    end if;
+	update proveedores set NOMBRE_PROVEEDOR = nombre where ID_PROVEEDOR = id;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `provprodAlt` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `provprodAlt`(in producto char(13), in precio double, in proveedor char(3))
+BEGIN
+	insert into relprovprod values
+    (producto, precio, proveedor);
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `provprodCon` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `provprodCon`(in id char(3))
+BEGIN
+	select ID_PRODUCTO, PRECIO_PRODUCTO, ID_PROVEEDOR
+    from relprovprod where
+	ID_PROVEEDOR = id;
+END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
@@ -335,4 +500,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-04-11 22:50:12
+-- Dump completed on 2016-06-06 22:50:49

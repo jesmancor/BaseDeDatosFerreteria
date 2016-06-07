@@ -16,28 +16,31 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `login`
+-- Table structure for table `compras`
 --
 
-DROP TABLE IF EXISTS `login`;
+DROP TABLE IF EXISTS `compras`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `login` (
-  `Id` int(10) NOT NULL,
-  `USERNAME` varchar(255) DEFAULT NULL,
-  `PASSWORD` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`Id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE `compras` (
+  `ID_COMPRA` int(5) NOT NULL AUTO_INCREMENT,
+  `ID_PROVEEDOR` char(10) NOT NULL,
+  `CANTIDAD_COMPRA` int(11) NOT NULL,
+  `PRECIO_UNITARIO_COMPRA` double NOT NULL,
+  `PRECIO_TOTAL_COMPRA` double NOT NULL,
+  PRIMARY KEY (`ID_COMPRA`),
+  UNIQUE KEY `ID_COMPRA_UNIQUE` (`ID_COMPRA`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `login`
+-- Dumping data for table `compras`
 --
 
-LOCK TABLES `login` WRITE;
-/*!40000 ALTER TABLE `login` DISABLE KEYS */;
-INSERT INTO `login` VALUES (1,'chuy','111111');
-/*!40000 ALTER TABLE `login` ENABLE KEYS */;
+LOCK TABLES `compras` WRITE;
+/*!40000 ALTER TABLE `compras` DISABLE KEYS */;
+INSERT INTO `compras` VALUES (1,'001',7,0,0),(2,'001',1,0,0),(3,'001',1,0,0);
+/*!40000 ALTER TABLE `compras` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -49,4 +52,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-06-06 22:50:47
+-- Dump completed on 2016-06-06 22:50:46
